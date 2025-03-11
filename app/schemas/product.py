@@ -1,6 +1,8 @@
-# Cхемы для продуктов:
+# Схемы для продуктов:
 from pydantic import BaseModel
+from typing import Optional
 from app.schemas.store import Store
+from app.schemas.category import Category
 
 
 class ProductBase(BaseModel):
@@ -17,6 +19,7 @@ class ProductBase(BaseModel):
     description: str
     price: float
     store_id: int
+    category_id: int
 
 
 class ProductCreate(ProductBase):
@@ -52,6 +55,7 @@ class Product(ProductBase):
     """
     id: int
     store: Store
+    category: Optional[Category] = None
 
     class Config:
         from_attributes = True

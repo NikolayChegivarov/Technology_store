@@ -13,6 +13,19 @@ class Store(Base):
     products = relationship("Product", back_populates="store")
 
 
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+    # Связь с продуктами
+    products = relationship("Product", back_populates="category")
+
+    def __repr__(self):
+        return f"Category(name='{self.name}')"
+
+
 class Product(Base):
     __tablename__ = "products"
 
@@ -21,8 +34,10 @@ class Product(Base):
     description = Column(String)
     price = Column(Float)
     store_id = Column(Integer, ForeignKey("stores.id"))
+    category_id = Column(Integer, ForeignKey("categories.id"))
 
     store = relationship("Store", back_populates="products")
+    category = relationship("Category", back_populates="products")
 
 
 class User(Base):
