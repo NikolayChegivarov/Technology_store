@@ -4,24 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-
-from sqlalchemy.ext.asyncio import create_async_engine
-
-from app.db.session import Base
-
-# Импортируйте свои модели
-from app.db.models import *
-
-target_metadata = Base.metadata
-
 from app.core.config import settings
-
-
-# Получаем URL из переменных окружения
-url = f"postgresql://{settings.USER_DB}:{settings.PASSWORD_DB}@{settings.HOST_DB}/{settings.NAME_DB}"
-
-# Настраиваем конфигурацию
-context.config.set_main_option('sqlalchemy.url', url)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,22 +12,23 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-if config.config_file_name is not None:
+if config.config_file_name:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = None
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+# Добавляем наши модели для поддержки автогенерации миграций
+from app.db.session import Base
+target_metadata = Base.metadata
 
 
-def run_migrations_offline() -> None:
+# Получаем URL базы данных из переменных окружения
+DATABASE_URL = f"postgresql://{settings.USER_DB}:{settings.PASSWORD_DB}@{settings.HOST_DB}/{settings.NAME_DB}"
+
+
+# Устанавливаем URL подключения к базе данных
+config.set_main_option('sqlalchemy.url', DATABASE_URL)
+
+
+def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -68,7 +52,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def run_migrations_online():
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -76,10 +60,9 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+        config.get_section(config.config_ini_section),
+        prefix='sqlalchemy.',
+        poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(
