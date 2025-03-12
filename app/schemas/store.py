@@ -12,6 +12,7 @@ class StoreBase(BaseModel):
     """
     name: str
     address: str
+    city: str
 
 
 class StoreCreate(StoreBase):

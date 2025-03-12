@@ -8,9 +8,13 @@ class Store(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    city = Column(String, index=True)
     address = Column(String, index=True)
 
     products = relationship("Product", back_populates="store")
+
+    def __repr__(self):
+        return f"Store(name='{self.name}', city='{self.city}')"
 
 
 class Category(Base):
