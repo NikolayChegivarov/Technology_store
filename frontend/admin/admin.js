@@ -1,28 +1,62 @@
-// Переключение вкладок
-document.querySelectorAll('.tab-button').forEach(button => {
-    button.addEventListener('click', () => {
-        // Убираем активный класс у всех кнопок и контента
-        document.querySelectorAll('.tab-button, .tab-content').forEach(element => {
-            element.classList.remove('active');
+// Переменные для модального окна
+const deleteModal = document.getElementById('delete-modal');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+const cancelDeleteBtn = document.getElementById('cancel-delete');
+let currentId = null;
+let entityType = null;
+
+// Функция открытия модального окна
+function openDeleteModal(id, entityName, type) {
+    currentId = id;
+    entityType = type;
+    document.getElementById('delete-message').textContent =
+        `Вы уверены, что хотите удалить ${entityName}?`;
+    deleteModal.style.display = 'block';
+}
+
+// Функция закрытия модального окна
+function closeDeleteModal() {
+    deleteModal.style.display = 'none';
+    currentId = null;
+    entityType = null;
+}
+
+// Обработчик удаления
+async function handleDelete() {
+    try {
+        const url = `http://localhost:8000/api/v1/${entityType}/${currentId}/`;
+
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
 
-        // Добавляем активный класс к выбранной кнопке и контенту
-        const tabId = button.getAttribute('data-tab');
-        button.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-
-        // Загружаем данные для активной вкладки
-        if (tabId === 'products') {
-            loadProducts();
-        } else if (tabId === 'stores') {
-            loadStores();
-        } else if (tabId === 'categories') {
-            loadCategories();
+        if (!response.ok) {
+            throw new Error(`Ошибка удаления: ${response.statusText}`);
         }
-    });
-});
 
-// Загрузка продуктов
+        // Перезагружаем данные после успешного удаления
+        switch(entityType) {
+            case 'products':
+                loadProducts();
+                break;
+            case 'stores':
+                loadStores();
+                break;
+            case 'categories':
+                loadCategories();
+                break;
+        }
+
+        closeDeleteModal();
+    } catch (error) {
+        alert(`Ошибка: ${error.message}`);
+    }
+}
+
+// Обновляем существующие функции загрузки данных
 async function loadProducts() {
     const response = await fetch('http://localhost:8000/api/v1/products/');
     const products = await response.json();
@@ -36,13 +70,12 @@ async function loadProducts() {
             Описание: ${product.description}<br>
             Цена: ${product.price} руб.
             <button onclick="editProduct(${product.id})">Редактировать</button>
-            <button onclick="deleteProduct(${product.id})">Удалить</button>
+            <button onclick="openDeleteModal(${product.id}, '${product.name}', 'products')">Удалить</button>
         `;
         productsList.appendChild(productItem);
     });
 }
 
-// Загрузка магазинов
 async function loadStores() {
     const response = await fetch('http://localhost:8000/api/v1/stores/');
     const stores = await response.json();
@@ -55,13 +88,12 @@ async function loadStores() {
             <strong>${store.name}</strong><br>
             Адрес: ${store.address}, ${store.city}
             <button onclick="editStore(${store.id})">Редактировать</button>
-            <button onclick="deleteStore(${store.id})">Удалить</button>
+            <button onclick="openDeleteModal(${store.id}, '${store.name}', 'stores')">Удалить</button>
         `;
         storesList.appendChild(storeItem);
     });
 }
 
-// Загрузка категорий
 async function loadCategories() {
     const response = await fetch('http://localhost:8000/api/v1/categories/');
     const categories = await response.json();
@@ -73,14 +105,19 @@ async function loadCategories() {
         categoryItem.innerHTML = `
             <strong>${category.name}</strong>
             <button onclick="editCategory(${category.id})">Редактировать</button>
-            <button onclick="deleteCategory(${category.id})">Удалить</button>
+            <button onclick="openDeleteModal(${category.id}, '${category.name}', 'categories')">Удалить</button>
         `;
         categoriesList.appendChild(categoryItem);
     });
 }
 
-// Загрузка данных при открытии страницы
-document.addEventListener('DOMContentLoaded', () => {
-    // По умолчанию активируем вкладку "Продукты"
-    document.querySelector('.tab-button').click();
+// Добавляем обработчики событий для модального окна
+confirmDeleteBtn.addEventListener('click', handleDelete);
+cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+// Закрываем модальное окно при клике вне его области
+deleteModal.addEventListener('click', (e) => {
+    if (e.target === deleteModal) {
+        closeDeleteModal();
+    }
 });
