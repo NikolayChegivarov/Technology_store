@@ -6,23 +6,23 @@ from sqlalchemy import pool
 from alembic import context
 from app.core.config import settings
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-config = context.config
-
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-if config.config_file_name:
-    fileConfig(config.config_file_name)
-
 # Добавляем наши модели для поддержки автогенерации миграций
+from app.db.models import Store, Category, Product, User, CartItem, Order
 from app.db.session import Base
 target_metadata = Base.metadata
+
+# это объект Alembic Config, который обеспечивает
+# доступ к значениям в используемом файле .ini.
+config = context.config
+
+# Интерпретировать файл конфигурации для ведения журнала Python.
+# Эта строка в основном настраивает регистраторы.
+if config.config_file_name:
+    fileConfig(config.config_file_name)
 
 
 # Получаем URL базы данных из переменных окружения
 DATABASE_URL = f"postgresql://{settings.USER_DB}:{settings.PASSWORD_DB}@{settings.HOST_DB}/{settings.NAME_DB}"
-
 
 # Устанавливаем URL подключения к базе данных
 config.set_main_option('sqlalchemy.url', DATABASE_URL)

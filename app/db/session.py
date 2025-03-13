@@ -11,10 +11,13 @@ engine = create_engine(
     echo=True
 )
 
+Base = declarative_base()
+
+# Метод проверяет существующие таблицы и создает только те, которых нет
+Base.metadata.create_all(bind=engine)
+
 # Фабрика сессий
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = declarative_base()
 
 
 def get_db():

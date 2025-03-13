@@ -18,7 +18,13 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(stores.router, prefix="/api/v1/stores", tags=["stores"])
 app.include_router(category.router, prefix="/api/v1/categories", tags=["categories"])
 
+
 # Редирект с корневого пути на index.html
 @app.get("/")
 async def read_root():
     return RedirectResponse(url="/static/index.html")  # Перенаправляем на index.html
+
+
+@app.get("/admin")
+async def admin_redirect():
+    return RedirectResponse(url="/static/admin/index.html")

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка</title>
+    <link rel="stylesheet" href="/static/admin/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Админ панель</h1>
+
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="products">Продукты</button>
+            <button class="tab-button" data-tab="stores">Магазины</button>
+            <button class="tab-button" data-tab="categories">Категории</button>
+        </div>
+
+        <!-- Контент вкладок -->
+        <div id="products" class="tab-content active">
+            <h2>Управление продуктами</h2>
+            <div id="products-list" class="admin-list"></div>
+            <button id="add-product" class="admin-button">Добавить продукт</button>
+        </div>
+
+        <div id="stores" class="tab-content">
+            <h2>Управление магазинами</h2>
+            <div id="stores-list" class="admin-list"></div>
+            <button id="add-store" class="admin-button">Добавить магазин</button>
+        </div>
+
+        <div id="categories" class="tab-content">
+            <h2>Управление категориями</h2>
+            <div id="categories-list" class="admin-list"></div>
+            <button id="add-category" class="admin-button">Добавить категорию</button>
+        </div>
+    </div>
+
+    <script src="/static/admin/admin.js"></script>
+</body>
+</html>
