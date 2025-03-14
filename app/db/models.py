@@ -43,6 +43,19 @@ class Product(Base):
     store = relationship("Store", back_populates="products")
     category = relationship("Category", back_populates="products")
 
+    def to_dict(self) -> dict:
+        """Преобразует объект продукта в словарь"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "price": float(self.price),
+            "store_id": self.store_id,
+            "category_id": self.category_id,
+            "store": self.store.to_dict() if hasattr(self, 'store') else None,
+            "category": self.category.to_dict() if hasattr(self, 'category') else None
+        }
+
 
 class User(Base):
     __tablename__ = "users"

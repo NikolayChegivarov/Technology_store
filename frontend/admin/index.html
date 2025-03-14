@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель администратора</title>
-    <link rel="stylesheet" href="/static/admin/admin.css">
 </head>
 <body>
-    <div class="admin-container">
-        <h1>Панель администратора</h1>
+<div class="admin-container">
+    <h1>Панель администратора</h1>
 
-        <!-- Вкладки -->
-        <nav class="tabs">
-            <a href="/admin/products" class="tab-button active">Продукты</a>
-            <a href="/admin/stores" class="tab-button">Магазины</a>
-            <a href="/admin/categories" class="tab-button">Категории</a>
-        </nav>
-    </div>
+    <!-- Вкладки -->
+    <nav class="tabs">
+        <form action="/admin/products/views_products" method="get" class="tab-form">
+            <button type="submit" class="tab-button {{ products_active }}">Продукты</button>
+        </form>
+        <form action="/admin/stores" method="get" class="tab-form">
+            <button type="submit" class="tab-button {{ stores_active }}">Магазины</button>
+        </form>
+        <form action="/admin/categories" method="get" class="tab-form">
+            <button type="submit" class="tab-button {{ categories_active }}">Категории</button>
+        </form>
+    </nav>
+</div>
 </body>
 </html>

@@ -3,10 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ панель - Продукты</title>
-    <link rel="stylesheet" href="/static/admin/admin.css">
+    <title>Список товаров</title>
 </head>
 <body>
+    <h1>Список товаров</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Цена</th>
+                <th>ID магазина</th>
+                <th>ID категории</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.store_id }}</td>
+                <td>{{ product.category_id }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <div class="admin-container">
         <h1>Продукты</h1>
 
@@ -22,3 +46,4 @@
     </div>
 </body>
 </html>
+
