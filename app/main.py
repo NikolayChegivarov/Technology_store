@@ -1,19 +1,16 @@
 # Точка входа в приложение, где создается экземпляр FastAPI и подключаются роутеры.
-from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
-from starlette.responses import JSONResponse
 
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
 from fastapi.responses import HTMLResponse
-from fastapi.requests import Request
-import os
-from pathlib import Path
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from app.db.session import get_db
 from sqlalchemy.orm import Session
-from frontend.admin.products.views_pr import get_list_product
+from app.views.admin.views_admin import get_list_product
+import os
+
 
 app = FastAPI()
 
@@ -67,13 +64,12 @@ async def admin_page(request: Request):
         print(f"Неожиданная ошибка: {str(e)}")
         return HTMLResponse("Внутренняя ошибка сервера", status_code=500)
 
-# Указываем путь к директории с шаблонами
-templates_dir = os.path.join("frontend", "admin", "products")
-templates = Jinja2Templates(directory=templates_dir)
-
 
 @app.get("/admin/products/views_products", response_class=HTMLResponse)
 async def views_products(request: Request, db: Session = Depends(get_db)):
+    # Указываем путь к директории с шаблонами
+    templates_dir = os.path.join("frontend", "admin", "products")
+    templates = Jinja2Templates(directory=templates_dir)
     products = get_list_product(db)
     return templates.TemplateResponse("views_products.html", {"request": request, "products": products})
 
