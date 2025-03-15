@@ -110,10 +110,6 @@
             width: 80px;
         }
 
-        .price {
-            text-align: right;
-            width: 120px;
-        }
 
         @media (max-width: 768px) {
             body {
@@ -157,9 +153,9 @@
                     <th class="product-id">ID</th>
                     <th>Название</th>
                     <th>Описание</th>
-                    <th class="price">Цена</th>
-                    <th>ID магазина</th>
-                    <th>ID категории</th>
+                    <th>Цена</th>
+                    <th>Филиал</th>
+                    <th>Категория</th>
                 </tr>
             </thead>
             <tbody>
@@ -169,8 +165,8 @@
                     <td>{{ product.name }}</td>
                     <td>{{ product.description }}</td>
                     <td>{{ product.price }}</td>
-                    <td>{{ product.store_id }}</td>
-                    <td>{{ product.category_id }}</td>
+                    <td>{{ product.store_name }}</td>
+                    <td>{{ product.category_name }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
