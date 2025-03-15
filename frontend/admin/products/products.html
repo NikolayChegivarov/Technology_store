@@ -128,6 +128,29 @@
                 padding: 0.75rem;
             }
         }
+
+        .delete-cell {
+            width: 60px;
+            text-align: center;
+        }
+
+        /* Стилизация чекбоксов */
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        /* Выделение строк с выбранными товарами */
+        tr:hover:not(:has(th)) {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        /* Стилизация кнопки удаления */
+        .controls {
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -146,31 +169,46 @@
             </a>
         </div>
 
-        <table>
-            <caption>Список товаров</caption>
-            <thead>
-                <tr>
-                    <th class="product-id">ID</th>
-                    <th>Название</th>
-                    <th>Описание</th>
-                    <th>Цена</th>
-                    <th>Филиал</th>
-                    <th>Категория</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.id }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.description }}</td>
-                    <td>{{ product.price }}</td>
-                    <td>{{ product.store_name }}</td>
-                    <td>{{ product.category_name }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <form action="/admin/delete_products" method="post">
+            <table>
+                <caption>Список товаров</caption>
+                <thead>
+                    <tr>
+                        <th class="product-id">ID</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Цена</th>
+                        <th>Филиал</th>
+                        <th>Категория</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.description }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.store_name }}</td>
+                        <td>{{ product.category_name }}</td>
+                        <td class="delete-cell">
+                            <input type="checkbox"
+                                   name="product_ids[]"
+                                   value="{{ product.id }}"
+                                   id="delete_{{ product.id }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="controls">
+                <button type="submit" class="back-button">
+                    Удалить выбранные товары
+                </button>
+            </div>
+        </form>
     </div>
 </body>
 </html>
