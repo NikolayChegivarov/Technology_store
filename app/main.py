@@ -6,9 +6,11 @@ from app.api.v1.endpoints import products, cart, orders, users, auth, stores, ca
 from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
+
+from app.crud.product import get_list_product
 from app.db.session import get_db
 from sqlalchemy.orm import Session
-from app.views.admin.views_admin import get_list_product
+
 import os
 
 
