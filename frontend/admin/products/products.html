@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление товарами</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f5f5f5;
+            --card-background: white;
+            --border-color: #ddd;
+            --hover-color: #e9ecef;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+            transform: translateX(-2px);
+        }
+
+        .back-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        caption {
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--hover-color);
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--hover-color);
+        }
+
+        tr:hover:not(:has(th)) {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        .product-id {
+            width: 80px;
+        }
+
+        .price {
+            text-align: right;
+            width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            table {
+                overflow-x: auto;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление товарами</h1>
+
+        <div class="controls">
+            <a href="/admin" class="back-button">
+                ← Назад к панели управления
+            </a>
+            <a href="/admin/create_product" class="back-button">
+                ← Создать продукт
+            </a>
+            <a href="/admin/delete_product" class="back-button">
+                ← Удалить продукт
+            </a>
+        </div>
+
+        <table>
+            <caption>Список товаров</caption>
+            <thead>
+                <tr>
+                    <th class="product-id">ID</th>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th class="price">Цена</th>
+                    <th>ID магазина</th>
+                    <th>ID категории</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.store_id }}</td>
+                    <td>{{ product.category_id }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

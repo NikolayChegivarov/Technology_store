@@ -37,48 +37,33 @@ async def read_root():
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Маршрут для главной страницы админки
-@app.get("/admin")
+# Маршрут для главной страницы админки.
+@app.get("/admin/")
 async def admin_page(request: Request):
-    print("=== Начало обработки запроса /admin ===")
+    # Указываем путь к директории с шаблонами
+    templates_dir = os.path.join("frontend", "admin")
+    templates = Jinja2Templates(directory=templates_dir)
+    return templates.TemplateResponse("index.html", {"request": request})
 
-    # Формируем путь к файлу относительно корневой директории
-    frontend_path = os.path.join(BASE_PATH, "frontend", "admin", "index.html")
-    print(f"Полный путь к файлу: {frontend_path}")
-
-    try:
-        # Проверяем существование файла
-        print(f"Проверка существования файла: {os.path.exists(frontend_path)}")
-
-        # Читаем содержимое файла
-        with open(frontend_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            print("Файл успешно прочитан")
-            return HTMLResponse(content, status_code=200)
-
-    except FileNotFoundError:
-        print(f"Ошибка: Файл {frontend_path} не найден")
-        return HTMLResponse("Файл админ-панели не найден", status_code=500)
-
-    except Exception as e:
-        print(f"Неожиданная ошибка: {str(e)}")
-        return HTMLResponse("Внутренняя ошибка сервера", status_code=500)
+# @app.get("/admin")
+# def admin_stores(request: Request):
+#     return HTMLResponse("frontend/admin/index.html", status_code=200)
 
 
-@app.get("/admin/products/views_products", response_class=HTMLResponse)
-async def views_products(request: Request, db: Session = Depends(get_db)):
+# Маршрут к корректировке товаров.
+@app.get("/admin/products/", response_class=HTMLResponse)
+async def admin_products(request: Request, db: Session = Depends(get_db)):
     # Указываем путь к директории с шаблонами
     templates_dir = os.path.join("frontend", "admin", "products")
     templates = Jinja2Templates(directory=templates_dir)
     products = get_list_product(db)
-    return templates.TemplateResponse("views_products.html", {"request": request, "products": products})
-
-
-@app.get("/admin/stores")
-def admin_stores(request: Request):
-    return HTMLResponse("frontend/admin/index.html", status_code=200)
+    return templates.TemplateResponse("products.html", {"request": request, "products": products})
 
 
 @app.get("/admin/categories")
-def admin_categories(request: Request):
-    return HTMLResponse("frontend/admin/index.html", status_code=200)
+def admin_categories(request: Request, db: Session = Depends(get_db)):
+    # Указываем путь к директории с шаблонами
+    templates_dir = os.path.join("frontend", "admin", "categories")
+    templates = Jinja2Templates(directory=templates_dir)
+    products = get_list_product(db)
+    return templates.TemplateResponse("categories.html", {"request": request, "products": products})
