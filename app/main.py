@@ -62,13 +62,21 @@ async def admin_products(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("products.html", {"request": request, "products": products})
 
 
-@app.post("/admin/delete_products")
+# Удаление товаров.
+@app.post("/admin/delete_products/")
 async def delete_products(
     product_ids: List[int] = Form(...),  # Используем Form для получения данных из формы
     session: AsyncSession = Depends(get_db)  # Внедряем сессию базы данных
 ):
     await delete_selected(product_ids, session)  # Передаем сессию в функцию
     return RedirectResponse(url="/admin/products/", status_code=303)
+
+
+@app.get("/admin/create_product/")
+async def create_product(request: Request, db: AsyncSession = Depends(get_db)):
+    templates_dir = os.path.join("frontend", "admin", "products")
+    templates = Jinja2Templates(directory=templates_dir)
+    return templates.TemplateResponse("create_product.html", {"request": request})
 
 
 @app.get("/admin/categories")
