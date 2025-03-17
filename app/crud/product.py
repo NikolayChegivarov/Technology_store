@@ -1,7 +1,6 @@
 # CRUD-операции для товаров
 from app.schemas.product import ProductCreate
 from sqlalchemy import select
-# from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi import HTTPException, Depends, status
 

@@ -1,23 +1,17 @@
 # Точка входа в приложение, где создается экземпляр FastAPI и подключаются роутеры.
-from urllib import request
-
+# from urllib import request
+# from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
-
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
-from fastapi.responses import HTMLResponse
-from fastapi import FastAPI, Request, Depends
-from fastapi.templating import Jinja2Templates
-
 from app.crud.product import get_list_product, delete_selected
 from app.db.session import get_db
+from fastapi import FastAPI, Request, Depends
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from typing import List
-
 from fastapi import Form
-
 import os
 
 
@@ -60,14 +54,6 @@ async def admin_page(request: Request):
 
 
 # Маршрут к корректировке товаров.
-# @app.get("/admin/products/", response_class=HTMLResponse)
-# async def admin_products(request: Request, db: Session = Depends(get_db)):
-#     # Указываем путь к директории с шаблонами
-#     templates_dir = os.path.join("frontend", "admin", "products")
-#     templates = Jinja2Templates(directory=templates_dir)
-#     products = await get_list_product(db)
-#     return templates.TemplateResponse("products.html", {"request": request, "products": products})
-
 @app.get("/admin/products/")
 async def admin_products(request: Request, db: AsyncSession = Depends(get_db)):
     templates_dir = os.path.join("frontend", "admin", "products")
@@ -76,19 +62,13 @@ async def admin_products(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("products.html", {"request": request, "products": products})
 
 
-# @app.post("/admin/delete_products")
-# async def delete_products(
-#         product_ids: List[int] = Depends(lambda: request.form.getlist('product_ids[]')),
-# ):
-#     await delete_selected(product_ids)
-#     return {"message": "Товары успешно удалены"}
 @app.post("/admin/delete_products")
 async def delete_products(
     product_ids: List[int] = Form(...),  # Используем Form для получения данных из формы
     session: AsyncSession = Depends(get_db)  # Внедряем сессию базы данных
 ):
     await delete_selected(product_ids, session)  # Передаем сессию в функцию
-    return {"message": "Товары успешно удалены"}
+    return RedirectResponse(url="/admin/products/", status_code=303)
 
 
 @app.get("/admin/categories")
