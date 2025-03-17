@@ -1,21 +1,26 @@
 # CRUD-операции для товаров
 from app.schemas.product import ProductCreate
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+# from sqlalchemy.orm import Session
 from sqlalchemy import text
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, status
 
 from app.db.models import Product
 from app.db.session import get_db
 
 from sqlalchemy.orm import selectinload
 
+from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete
 
-def get_products(db: Session, skip: int = 0, limit: int = 100):
+
+async def get_products(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[Product]:
     """
     Получение списка продуктов с поддержкой пагинации.
 
     Args:
-        db (Session): Сессия базы данных
+        db (AsyncSession): Асинхронная сессия базы данных
         skip (int): Количество элементов для пропуска (по умолчанию 0)
         limit (int): Максимальное количество элементов для возврата (по умолчанию 100)
 
@@ -25,34 +30,49 @@ def get_products(db: Session, skip: int = 0, limit: int = 100):
     Note:
         Использует SQLAlchemy для эффективного запроса к базе данных с пагинацией
     """
-    return db.query(Product).offset(skip).limit(limit).all()
+    return await db.query(Product).offset(skip).limit(limit).all()
 
 
-def get_list_product(db: Session = Depends(get_db)):
+async def get_product(db: AsyncSession, product_id: int) -> Product | None:
+    """
+    Получение информации о конкретном продукте по его ID.
+
+    Args:
+        db (AsyncSession): Асинхронная сессия базы данных
+        product_id (int): ID продукта для получения
+
+    Returns:
+        Product | None: Объект Product если найден, None если продукт не существует
+
+    Note:
+        Использует SQLAlchemy для точного поиска продукта по ID
+    """
+    result = await db.query(Product).filter(Product.id == product_id).first()
+    return result
+
+
+async def get_list_product(db: AsyncSession = Depends(get_db)):
     print("Сработал get_list_product")
     try:
-        # Проверяем подключение к базе данных
-        db.execute(text("SELECT 1"))
+        await db.execute(text("SELECT 1"))
         print("Подключение к базе данных установлено успешно")
 
-        # Загружаем продукты с магазинами и категориями одним запросом
-        products = (
-            db.query(Product)
-            .options(
-                selectinload(Product.store),
-                selectinload(Product.category)
-            )
-            .all()
+        # Используем новый стиль запросов с select
+        stmt = select(Product).options(
+            selectinload(Product.store),
+            selectinload(Product.category)
         )
+        result = await db.execute(stmt)
+        products = result.scalars().all()
 
-        # Преобразуем результаты в список словарей
+        # Формируем результат
         result = [{
             "id": p.id,
             "name": p.name,
             "description": p.description,
             "price": p.price,
-            "store_name": p.store.name if hasattr(p, 'store') else None,
-            "category_name": p.category.name if hasattr(p, 'category') else None
+            "store_name": p.store.name if p.store else None,
+            "category_name": p.category.name if p.category else None
         } for p in products]
 
         print(f"result = {result}")
@@ -63,26 +83,38 @@ def get_list_product(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Ошибка подключения к базе данных")
 
 
-def get_product(db: Session, product_id: int):
+async def create_product(db: AsyncSession, product: ProductCreate) -> Product:
     """
-    Получение информации о конкретном продукте по его ID.
+    Создание нового продукта в базе данных.
 
     Args:
-        db (Session): Сессия базы данных
-        product_id (int): ID продукта для получения
+        db (AsyncSession): Асинхронная сессия базы данных
+        product (ProductCreate): Данные для создания продукта
 
     Returns:
-        Product | None: Объект Product если найден, None если продукт не существует
+        Product: Созданный продукт
 
     Note:
-        Использует SQLAlchemy для точного поиска продукта по ID
+        Использует SQLAlchemy для создания записи в базе данных
     """
-    return db.query(Product).filter(Product.id == product_id).first()
-
-
-def create_product(db: Session, product: ProductCreate):
     db_product = Product(**product.dict())
     db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
+    await db.commit()
+    await db.refresh(db_product)
     return db_product
+
+
+async def delete_selected(product_ids: List[int], session: AsyncSession):
+    """Удаляет продукты по списку ID"""
+    if not product_ids:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Не выбраны товары для удаления"
+        )
+
+    await session.execute(
+        delete(Product).where(Product.id.in_(product_ids))
+    )
+    await session.commit()
+
+

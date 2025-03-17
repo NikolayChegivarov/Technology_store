@@ -166,13 +166,12 @@
             <a href="/admin/create_product" class="back-button">
                 ← Создать продукт
             </a>
-            <a href="/admin/delete_product" class="back-button">
-                ← Удалить продукт
-            </a>
         </div>
 
         /* Обновленная разметка таблицы */
-        <form action="/admin/delete_products" method="post">
+        <form action="/admin/delete_products" method="post" style="display: inline;">
+            <button type="submit" class="back-button">← Удалить продукт</button>
+
             <table>
                 <caption>Список товаров</caption>
                 <thead>
@@ -191,7 +190,7 @@
                     <tr>
                         <td class="delete-cell">
                             <input type="checkbox"
-                                   name="product_ids[]"
+                                   name="product_ids"
                                    value="{{ product.id }}"
                                    id="delete_{{ product.id }}">
                         </td>

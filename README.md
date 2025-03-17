@@ -19,5 +19,5 @@ docker run -d -p 80:80 my_fastapi_project
 
 Установите зависимости вручную:
 ```bash
-pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic python-jose[cryptography] passlib python-multipart pydantic-settings pip install pytest email-validator
+pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic python-jose[cryptography] passlib python-multipart pydantic-settings pytest email-validator sqlalchemy[asyncio] asyncpg
 ```
