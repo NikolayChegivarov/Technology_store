@@ -6,24 +6,25 @@
     <title>Create Product</title>
 </head>
 <body>
-    <h1>Create Product</h1>
+
+    <h1>Создать товар</h1>
     <form action="/admin/create_product/" method="post">
-        <label for="name">Name:</label><br>
+        <label for="name">Имя:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
-        <label for="description">Description:</label><br>
+        <label for="description">Описание:</label><br>
         <textarea id="description" name="description" required></textarea><br><br>
 
-        <label for="price">Price:</label><br>
+        <label for="price">Цена:</label><br>
         <input type="number" id="price" name="price" step="0.01" required><br><br>
 
-        <label for="store_id">Store ID:</label><br>
+        <label for="store_id">Филиал:</label><br>
         <input type="number" id="store_id" name="store_id" required><br><br>
 
-        <label for="category_id">Category ID:</label><br>
+        <label for="category_id">Категория:</label><br>
         <input type="number" id="category_id" name="category_id" required><br><br>
 
-        <input type="submit" value="Create">
+        <input type="submit" value="Создать">
     </form>
 </body>
 </html>
