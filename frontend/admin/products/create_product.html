@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Titla</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Product</title>
 </head>
 <body>
+    <h1>Create Product</h1>
+    <form action="/admin/create_product/" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+
+        <label for="price">Price:</label><br>
+        <input type="number" id="price" name="price" step="0.01" required><br><br>
+
+        <label for="store_id">Store ID:</label><br>
+        <input type="number" id="store_id" name="store_id" required><br><br>
+
+        <label for="category_id">Category ID:</label><br>
+        <input type="number" id="category_id" name="category_id" required><br><br>
+
+        <input type="submit" value="Create">
+    </form>
 </body>
 </html>

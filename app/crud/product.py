@@ -92,9 +92,6 @@ async def create_product(db: AsyncSession, product: ProductCreate) -> Product:
 
     Returns:
         Product: Созданный продукт
-
-    Note:
-        Использует SQLAlchemy для создания записи в базе данных
     """
     db_product = Product(**product.dict())
     db.add(db_product)
@@ -110,7 +107,6 @@ async def delete_selected(product_ids: List[int], session: AsyncSession):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Не выбраны товары для удаления"
         )
-
     await session.execute(
         delete(Product).where(Product.id.in_(product_ids))
     )

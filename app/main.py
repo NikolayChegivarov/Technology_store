@@ -4,7 +4,7 @@
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
-from app.crud.product import get_list_product, delete_selected
+from app.crud.product import get_list_product, delete_selected, create_product
 from app.db.session import get_db
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
@@ -14,6 +14,7 @@ from typing import List
 from fastapi import Form
 import os
 
+from app.schemas.product import ProductCreate
 
 app = FastAPI()
 
@@ -73,10 +74,40 @@ async def delete_products(
 
 
 @app.get("/admin/create_product/")
-async def create_product(request: Request, db: AsyncSession = Depends(get_db)):
+async def url_create_product(request: Request):
     templates_dir = os.path.join("frontend", "admin", "products")
     templates = Jinja2Templates(directory=templates_dir)
     return templates.TemplateResponse("create_product.html", {"request": request})
+
+
+@app.post("/admin/create_product/")
+async def create_product_post(
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    store_id: int = Form(...),
+    category_id: int = Form(...),
+    db: AsyncSession = Depends(get_db)  # Сессия базы данных
+):
+    # Проверяем данные
+    print(f"Новый товар: name={name}, description={description}, price={price}, "
+          f"store_id={store_id}, category_id={category_id}")
+
+    # Создаем объект ProductCreate
+    product_data = ProductCreate(
+        name=name,
+        description=description,
+        price=price,
+        store_id=store_id,
+        category_id=category_id
+    )
+
+    # Создаем продукт в базе данных
+    await create_product(db, product_data)
+
+    # Перенаправляем на страницу создания продукта
+    return RedirectResponse(url="/admin/create_product/", status_code=303)
 
 
 @app.get("/admin/categories")
