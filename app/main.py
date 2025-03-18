@@ -2,9 +2,10 @@
 # from urllib import request
 # from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
 from app.crud.product import get_list_product, delete_selected, create_product
+from app.db.models import Store, Category
 from app.db.session import get_db
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from fastapi import Form
+from sqlalchemy.future import select
 import os
 
 from app.schemas.product import ProductCreate
@@ -73,11 +75,24 @@ async def delete_products(
     return RedirectResponse(url="/admin/products/", status_code=303)
 
 
-@app.get("/admin/create_product/")
-async def url_create_product(request: Request):
+@app.get("/admin/product_form/", response_class=HTMLResponse)
+async def product_form(request: Request, db: AsyncSession = Depends(get_db)):
     templates_dir = os.path.join("frontend", "admin", "products")
     templates = Jinja2Templates(directory=templates_dir)
-    return templates.TemplateResponse("create_product.html", {"request": request})
+
+    # Получаем список всех филиалов и категорий
+    result = await db.execute(select(Store))
+    stores = result.scalars().all()
+
+    result = await db.execute(select(Category))
+    categories = result.scalars().all()
+
+    # Передаем данные в шаблон
+    return templates.TemplateResponse("create_product.html", {
+        "request": request,
+        "stores": stores,
+        "categories": categories
+    })
 
 
 @app.post("/admin/create_product/")
@@ -107,7 +122,7 @@ async def create_product_post(
     await create_product(db, product_data)
 
     # Перенаправляем на страницу создания продукта
-    return RedirectResponse(url="/admin/create_product/", status_code=303)
+    return RedirectResponse(url="/admin/product_form/", status_code=303)
 
 
 @app.get("/admin/categories")
