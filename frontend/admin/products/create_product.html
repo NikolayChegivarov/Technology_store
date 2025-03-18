@@ -21,7 +21,7 @@
         <label for="store_id">Филиал:</label><br>
         <select id="store_id" name="store_id" required>
             {% for store in stores %}
-                <option value="{{ store.id }}">{{ store.name }} ({{ store.city }})</option>
+                <option value="{{ store.id }}">{{ store.city }} ({{ store.address }})</option>
             {% endfor %}
         </select><br><br>
 
