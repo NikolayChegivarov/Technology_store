@@ -10,7 +10,6 @@ class StoreBase(BaseModel):
         name (str): Название магазина
         address (str): Адрес магазина
     """
-    name: str
     address: str
     city: str
 

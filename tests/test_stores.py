@@ -7,7 +7,6 @@ client = TestClient(app)
 def test_create_store():
     response = client.post("/api/v1/stores/", json={"name": "SuperStore", "address": "123 Main St", "city": "New York"})
     assert response.status_code == 200
-    assert response.json()["name"] == "SuperStore"
     assert response.json()["city"] == "New York"
 
 

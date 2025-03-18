@@ -70,7 +70,8 @@ async def get_list_product(db: AsyncSession = Depends(get_db)):
             "name": p.name,
             "description": p.description,
             "price": p.price,
-            "store_name": p.store.name if p.store else None,
+            "store_city": p.store.city if p.store else None,  # Используем city вместо name
+            "store_address": p.store.address if p.store else None,  # Добавляем адрес магазина
             "category_name": p.category.name if p.category else None
         } for p in products]
 
