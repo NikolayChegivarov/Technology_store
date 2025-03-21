@@ -52,8 +52,15 @@ class Product(Base):
             "price": float(self.price),
             "store_id": self.store_id,
             "category_id": self.category_id,
-            "store": self.store.to_dict() if hasattr(self, 'store') else None,
-            "category": self.category.to_dict() if hasattr(self, 'category') else None
+            "store": {
+                "id": self.store.id,
+                "city": self.store.city,
+                "address": self.store.address
+            } if self.store else None,
+            "category": {
+                "id": self.category.id,
+                "name": self.category.name
+            } if self.category else None
         }
 
 

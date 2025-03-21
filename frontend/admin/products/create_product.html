@@ -9,7 +9,7 @@
 
     <h1>Создать товар</h1>
     <form action="/admin/create_product/" method="post">
-        <label for="name">Имя:</label><br>
+        <label for="name">Наименование:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
         <label for="description">Описание:</label><br>
@@ -34,5 +34,27 @@
 
         <input type="submit" value="Создать">
     </form>
+
+    {% if created_product %}
+    <h2>Созданный товар:</h2>
+    <p><strong>Наименование:</strong> {{ created_product["name"] }}</p>
+    <p><strong>Описание:</strong> {{ created_product["description"] }}</p>
+    <p><strong>Цена:</strong> {{ created_product["price"] }}</p>
+
+    {% if created_product.store %}
+        <p><strong>Филиал:</strong> {{ created_product.store.city }} ({{ created_product.store.address }})</p>
+    {% else %}
+        <p>Филиал не указан.</p>
+    {% endif %}
+
+    {% if created_product.category %}
+        <p><strong>Категория:</strong> {{ created_product.category.name }}</p>
+    {% else %}
+        <p>Категория не указана.</p>
+    {% endif %}
+
+    {% else %}
+    <p>Нет данных о созданном товаре.</p>
+    {% endif %}
 </body>
 </html>
