@@ -169,24 +169,24 @@ async def create_product_post(
 async def admin_stores(request: Request, db: AsyncSession = Depends(get_db)):
     templates_dir = os.path.join("frontend", "admin", "stores")
     templates = Jinja2Templates(directory=templates_dir)
-    stores = await get_list_product(db)
-    return templates.TemplateResponse("stores.html", {"request": request, "stores": stores})
 
-    # # Добавляем количество товаров для каждого магазина
-    # stores_with_counts = []
-    # for store in stores:
-    #     store_dict = {
-    #         "id": store.id,
-    #         "city": store.city,
-    #         "address": store.address,
-    #         "products_count": len(store.products)
-    #     }
-    #     stores_with_counts.append(store_dict)
-    #
-    # return templates.TemplateResponse("stores.html", {
-    #     "request": request,
-    #     "stores": stores_with_counts
-    # })
+    # Загружаем магазины вместе с товарами
+    stores = await get_list_stores(db)
+
+    stores_with_counts = []
+    for store in stores:
+        store_data = {
+            "id": store.id,
+            "city": store.city,
+            "address": store.address,
+            "products_count": len(store.products)  # Теперь должно работать
+        }
+        stores_with_counts.append(store_data)
+
+    return templates.TemplateResponse("stores.html", {
+        "request": request,
+        "stores": stores_with_counts
+    })
 
 
 # Форма создания магазина
@@ -204,7 +204,7 @@ async def create_store(
     city: str = Form(...),
     address: str = Form(...),
     db: AsyncSession = Depends(get_db)
-):
+    ):
     new_store = Store(city=city, address=address)
     db.add(new_store)
     await db.commit()
@@ -217,7 +217,7 @@ async def delete_stores(
     request: Request,
     store_ids: List[int] = Form(...),
     db: AsyncSession = Depends(get_db)
-):
+    ):
     await crud_delete_stores(db, store_ids)
     return RedirectResponse(url="/admin/stores", status_code=303)
 

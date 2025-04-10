@@ -2,7 +2,7 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.db.models import Store
 from app.schemas.store import StoreCreate
@@ -53,7 +53,9 @@ async def get_list_stores(db: AsyncSession):
     Returns:
         List[Store]: Список всех магазинов
     """
-    result = await db.execute(select(Store))
+    result = await db.execute(
+        select(Store).options(selectinload(Store.products))
+    )
     return result.scalars().all()
 
 
