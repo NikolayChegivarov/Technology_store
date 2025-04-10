@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление товарами</title>
+    <title>Управление магазинами</title>
     <style>
         :root {
             --primary-color: #007bff;
@@ -155,7 +155,7 @@
         }
 
         /* Добавляем новый класс для ячейки с ID */
-        .product-id {
+        .store-id {
             width: 80px;
             text-align: right;
         }
@@ -181,7 +181,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Управление товарами</h1>
+        <h1>Управление магазинами</h1>
 
         <div class="controls">
             <div class="controls-row">
@@ -191,44 +191,40 @@
             </div>
 
             <div class="controls-row">
-                <a href="/admin/product_form/" class="back-button">
-                    Создать продукт
+                <a href="/admin/store_form/" class="back-button">
+                    Создать магазин
                 </a>
                 <button type="submit" form="deleteForm" class="back-button delete-button">
-                    Удалить выделенные товары
+                    Удалить выделенные магазины
                 </button>
             </div>
         </div>
 
-        <form id="deleteForm" action="/admin/delete_products" method="post">
+        <form id="deleteForm" action="/admin/delete_stores" method="post">
             <table>
-                <caption>Список товаров</caption>
+                <caption>Список магазинов</caption>
                 <thead>
                     <tr>
                         <th class="delete-cell"></th>
-                        <th class="product-id">ID</th>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th>Цена</th>
-                        <th>Филиал</th>
-                        <th>Категория</th>
+                        <th class="store-id">ID</th>
+                        <th>Город</th>
+                        <th>Адрес</th>
+                        <th>Количество товаров</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for product in products %}
+                    {% for store in stores %}
                     <tr>
                         <td class="delete-cell">
                             <input type="checkbox"
-                                   name="product_ids"
-                                   value="{{ product.id }}"
-                                   id="delete_{{ product.id }}">
+                                   name="store_ids"
+                                   value="{{ store.id }}"
+                                   id="delete_{{ store.id }}">
                         </td>
-                        <td class="product-id">{{ product.id }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.description }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.store_name }}</td>
-                        <td>{{ product.category_name }}</td>
+                        <td class="store-id">{{ store.id }}</td>
+                        <td>{{ store.city }}</td>
+                        <td>{{ store.address }}</td>
+                        <td>{{ store.products_count if store.products_count else 0 }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

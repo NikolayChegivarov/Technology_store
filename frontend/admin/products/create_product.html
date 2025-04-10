@@ -4,57 +4,200 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Product</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-section, .result-section {
+            flex: 1;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+
+        form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        input[type="submit"] {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #27ae60;
+        }
+
+        .product-result {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .product-result p {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-result p:last-child {
+            border-bottom: none;
+        }
+
+        .no-data {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="form-section">
+            <h1>Создать товар</h1>
 
-    <h1>Создать товар</h1>
-    <form action="/admin/create_product/" method="post">
-        <label for="name">Наименование:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+            <form action="/admin/create_product/" method="post">
+                <label for="name">Наименование:</label>
+                <input type="text" id="name" name="name" required>
 
-        <label for="description">Описание:</label><br>
-        <textarea id="description" name="description" required></textarea><br><br>
+                <label for="description">Описание:</label>
+                <textarea id="description" name="description" required></textarea>
 
-        <label for="price">Цена:</label><br>
-        <input type="number" id="price" name="price" step="0.01" required><br><br>
+                <label for="price">Цена:</label>
+                <input type="number" id="price" name="price" step="0.01" required>
 
-        <label for="store_id">Филиал:</label><br>
-        <select id="store_id" name="store_id" required>
-            {% for store in stores %}
-                <option value="{{ store.id }}">{{ store.city }} ({{ store.address }})</option>
-            {% endfor %}
-        </select><br><br>
+                <label for="store_id">Филиал:</label>
+                <select id="store_id" name="store_id" required>
+                    {% for store in stores %}
+                        <option value="{{ store.id }}">{{ store.city }} ({{ store.address }})</option>
+                    {% endfor %}
+                </select>
 
-        <label for="category_id">Категория:</label><br>
-        <select id="category_id" name="category_id" required>
-            {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-        </select><br><br>
+                <label for="category_id">Категория:</label>
+                <select id="category_id" name="category_id" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
 
-        <input type="submit" value="Создать">
-    </form>
+                <input type="submit" value="Создать">
+            </form>
 
-    {% if created_product %}
-    <h2>Созданный товар:</h2>
-    <p><strong>Наименование:</strong> {{ created_product["name"] }}</p>
-    <p><strong>Описание:</strong> {{ created_product["description"] }}</p>
-    <p><strong>Цена:</strong> {{ created_product["price"] }}</p>
+            <a href="/admin/products" class="back-button">
+                ← Назад к управлению товарами
+            </a>
+        </div>
 
-    {% if created_product.store %}
-        <p><strong>Филиал:</strong> {{ created_product.store.city }} ({{ created_product.store.address }})</p>
-    {% else %}
-        <p>Филиал не указан.</p>
-    {% endif %}
+        <div class="result-section">
+            {% if created_product %}
+            <div class="product-result">
+                <h2>Созданный товар:</h2>
+                <p><strong>Наименование:</strong> {{ created_product["name"] }}</p>
+                <p><strong>Описание:</strong> {{ created_product["description"] }}</p>
+                <p><strong>Цена:</strong> {{ created_product["price"] }}</p>
 
-    {% if created_product.category %}
-        <p><strong>Категория:</strong> {{ created_product.category.name }}</p>
-    {% else %}
-        <p>Категория не указана.</p>
-    {% endif %}
+                {% if created_product.store %}
+                    <p><strong>Филиал:</strong> {{ created_product.store.city }} ({{ created_product.store.address }})</p>
+                {% else %}
+                    <p>Филиал не указан.</p>
+                {% endif %}
 
-    {% else %}
-    <p>Нет данных о созданном товаре.</p>
-    {% endif %}
+                {% if created_product.category %}
+                    <p><strong>Категория:</strong> {{ created_product.category.name }}</p>
+                {% else %}
+                    <p>Категория не указана.</p>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="product-result">
+                <h2>Созданный товар:</h2>
+                <p class="no-data">Нет данных о созданном товаре.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>
