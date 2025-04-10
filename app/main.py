@@ -6,17 +6,22 @@ from app.crud.product import get_list_product, delete_selected, create_product
 from app.db.models import Store, Category
 from app.db.session import get_db
 from app.crud.store import delete_stores as crud_delete_stores, get_list_stores
-from fastapi import FastAPI, Request, Depends, HTTPException
+from app.schemas.product import ProductCreate
+from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
-from fastapi import Form
 from sqlalchemy.future import select
 from starlette.middleware.sessions import SessionMiddleware
+from sqlalchemy.orm import joinedload
+from app.crud.category import (
+    get_categories_with_products,
+    create_category as create_category_db,
+    delete_categories as delete_categories_db
+)
 import os
+from typing import List
 
-from app.schemas.product import ProductCreate
 
 app = FastAPI()
 
@@ -179,7 +184,7 @@ async def admin_stores(request: Request, db: AsyncSession = Depends(get_db)):
             "id": store.id,
             "city": store.city,
             "address": store.address,
-            "products_count": len(store.products)  # Теперь должно работать
+            "products_count": len(store.products)
         }
         stores_with_counts.append(store_data)
 
@@ -230,10 +235,44 @@ async def delete_stores(
     return RedirectResponse(url="/admin/stores", status_code=303)
 
 
-@app.get("/admin/categories")
-def admin_categories(request: Request, db: Session = Depends(get_db)):
-    # Указываем путь к директории с шаблонами
-    templates_dir = os.path.join("frontend", "admin", "categories")
+# Список категорий
+@app.get("/admin/categories/", response_class=HTMLResponse)
+async def admin_categories(request: Request, db: AsyncSession = Depends(get_db)):
+    templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "categories")
     templates = Jinja2Templates(directory=templates_dir)
-    products = get_list_product(db)
-    return templates.TemplateResponse("categories.html", {"request": request, "products": products})
+
+    categories = await get_categories_with_products(db)
+
+    return templates.TemplateResponse("categories.html", {
+        "request": request,
+        "categories": categories
+    })
+
+
+# Создание категории
+@app.post("/admin/create_category/", response_class=HTMLResponse)
+async def create_category(
+        request: Request,
+        name: str = Form(...),
+        db: AsyncSession = Depends(get_db)
+):
+    category_data = create_category(name=name)
+    created_category = await create_category_db(db, category_data)
+
+    templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "categories")
+    templates = Jinja2Templates(directory=templates_dir)
+    return templates.TemplateResponse("create_category.html", {
+        "request": request,
+        "created_category": created_category
+    })
+
+
+# Удаление категорий
+@app.post("/admin/delete_categories/", response_class=HTMLResponse)
+async def delete_categories(
+        request: Request,
+        category_ids: List[int] = Form(...),
+        db: AsyncSession = Depends(get_db)
+):
+    await delete_categories_db(db, category_ids)
+    return RedirectResponse(url="/admin/categories/", status_code=303)

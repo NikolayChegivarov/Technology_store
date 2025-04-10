@@ -1,59 +1,47 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from app.db.models import Category
 from app.schemas.category import CategoryCreate
+from typing import List
 
 
-def get_category(db: Session, category_id: int):
-    """
-    Получение категории по ID.
-
-    Args:
-        db (Session): Сессия базы данных
-        category_id (int): ID категории для поиска
-
-    Returns:
-        Category: Объект категории или None, если категория не найдена
-
-    Note:
-        Использует SQLAlchemy для выполнения запроса к базе данных
-    """
-    return db.query(Category).filter(Category.id == category_id).first()
+async def get_category(db: AsyncSession, category_id: int) -> Category | None:
+    """Получить категорию по ID"""
+    result = await db.execute(select(Category).where(Category.id == category_id))
+    return result.scalars().first()
 
 
-def get_categories(db: Session, skip: int = 0, limit: int = 100):
-    """
-    Получение списка категорий с возможностью постраничной загрузки.
-
-    Args:
-        db (Session): Сессия базы данных
-        skip (int): Количество записей для пропуска (по умолчанию 0)
-        limit (int): Максимальное количество записей для возврата (по умолчанию 100)
-
-    Returns:
-        List[Category]: Список объектов категорий
-
-    Note:
-        Использует SQLAlchemy для выполнения запроса с пагинацией
-    """
-    return db.query(Category).offset(skip).limit(limit).all()
+async def get_categories(db: AsyncSession, skip: int = 0, limit: int = 100) -> list[Category]:
+    """Получить список категорий с пагинацией"""
+    result = await db.execute(select(Category).offset(skip).limit(limit))
+    return result.scalars().all()
 
 
-def create_category(db: Session, category: CategoryCreate):
-    """
-    Создание новой категории.
+async def get_categories_with_products(db: AsyncSession) -> list[Category]:
+    """Получить категории с загруженными продуктами"""
+    result = await db.execute(
+        select(Category).options(selectinload(Category.products))
+    )
+    return result.scalars().all()
 
-    Args:
-        db (Session): Сессия базы данных
-        category (CategoryCreate): Данные для создания категории
 
-    Returns:
-        Category: Созданный объект категории
-
-    Note:
-        Автоматически обновляет объект из базы данных после создания
-    """
+async def create_category(db: AsyncSession, category: CategoryCreate) -> Category:
+    """Создать новую категорию"""
     db_category = Category(**category.dict())
     db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
+    await db.commit()
+    await db.refresh(db_category)
     return db_category
+
+
+async def delete_categories(db: AsyncSession, category_ids: List[int]) -> int:
+    """Удалить категории по списку ID"""
+    count = 0
+    for category_id in category_ids:
+        category = await db.get(Category, category_id)
+        if category:
+            await db.delete(category)
+            count += 1
+    await db.commit()
+    return count
