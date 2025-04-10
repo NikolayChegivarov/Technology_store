@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать магазин</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-section, .result-section {
+            flex: 1;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #2980b9;
+        }
+
+        form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        input[type="submit"] {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #27ae60;
+        }
+
+        .store-result {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .store-result p {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .store-result p:last-child {
+            border-bottom: none;
+        }
+
+        .no-data {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h1>Создать магазин</h1>
+
+            <form action="/admin/create_store/" method="post">
+                <label for="city">Город:</label>
+                <input type="text" id="city" name="city" required>
+
+                <label for="address">Адрес:</label>
+                <textarea id="address" name="address" required></textarea>
+
+                <input type="submit" value="Создать">
+            </form>
+
+            <a href="/admin/stores" class="back-button">
+                ← Назад к управлению магазинами
+            </a>
+        </div>
+
+        <div class="result-section">
+            {% if created_store %}
+            <div class="store-result">
+                <h2>Созданный магазин:</h2>
+                <p><strong>Город:</strong> {{ created_store.city }}</p>
+                <p><strong>Адрес:</strong> {{ created_store.address }}</p>
+                <p><strong>ID:</strong> {{ created_store.id }}</p>
+            </div>
+            {% else %}
+            <div class="store-result">
+                <h2>Созданный магазин:</h2>
+                <p class="no-data">Нет данных о созданном магазине.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

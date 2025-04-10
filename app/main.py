@@ -191,24 +191,32 @@ async def admin_stores(request: Request, db: AsyncSession = Depends(get_db)):
 
 # Форма создания магазина
 @app.get("/admin/store_form/", response_class=HTMLResponse)
-async def store_form(request: Request):
-    templates_dir = os.path.join("frontend", "admin", "stores")
+async def store_form(request: Request, db: AsyncSession = Depends(get_db)):
+    templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "stores")
+    print(f"Looking for template in: {templates_dir}")  # Для отладки
     templates = Jinja2Templates(directory=templates_dir)
-    return templates.TemplateResponse("store_form.html", {"request": request})
+    return templates.TemplateResponse("create_store.html", {"request": request})
 
 
 # Создание магазина
 @app.post("/admin/create_store/", response_class=HTMLResponse)
 async def create_store(
-    request: Request,
-    city: str = Form(...),
-    address: str = Form(...),
-    db: AsyncSession = Depends(get_db)
-    ):
+        request: Request,
+        city: str = Form(...),
+        address: str = Form(...),
+        db: AsyncSession = Depends(get_db)
+):
     new_store = Store(city=city, address=address)
     db.add(new_store)
     await db.commit()
-    return RedirectResponse(url="/admin/stores", status_code=303)
+    await db.refresh(new_store)
+
+    templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "stores")
+    templates = Jinja2Templates(directory=templates_dir)
+    return templates.TemplateResponse("create_store.html", {
+        "request": request,
+        "created_store": new_store
+    })
 
 
 # Удаление магазинов
@@ -217,7 +225,7 @@ async def delete_stores(
     request: Request,
     store_ids: List[int] = Form(...),
     db: AsyncSession = Depends(get_db)
-    ):
+):
     await crud_delete_stores(db, store_ids)
     return RedirectResponse(url="/admin/stores", status_code=303)
 
