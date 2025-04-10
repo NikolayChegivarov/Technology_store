@@ -1,12 +1,11 @@
 # Точка входа в приложение, где создается экземпляр FastAPI и подключаются роутеры.
-# from urllib import request
-# from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, HTMLResponse
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
 from app.crud.product import get_list_product, delete_selected, create_product
 from app.db.models import Store, Category
 from app.db.session import get_db
+from app.crud.store import delete_stores as crud_delete_stores, get_list_stores
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -163,6 +162,64 @@ async def create_product_post(
 
     # Перенаправляем на страницу создания продукта
     return RedirectResponse(url="/admin/product_form/", status_code=303)
+
+
+# Список магазинов
+@app.get("/admin/stores/", response_class=HTMLResponse)
+async def admin_stores(request: Request, db: AsyncSession = Depends(get_db)):
+    templates_dir = os.path.join("frontend", "admin", "stores")
+    templates = Jinja2Templates(directory=templates_dir)
+    stores = await get_list_product(db)
+    return templates.TemplateResponse("stores.html", {"request": request, "stores": stores})
+
+    # # Добавляем количество товаров для каждого магазина
+    # stores_with_counts = []
+    # for store in stores:
+    #     store_dict = {
+    #         "id": store.id,
+    #         "city": store.city,
+    #         "address": store.address,
+    #         "products_count": len(store.products)
+    #     }
+    #     stores_with_counts.append(store_dict)
+    #
+    # return templates.TemplateResponse("stores.html", {
+    #     "request": request,
+    #     "stores": stores_with_counts
+    # })
+
+
+# Форма создания магазина
+@app.get("/admin/store_form/", response_class=HTMLResponse)
+async def store_form(request: Request):
+    templates_dir = os.path.join("frontend", "admin", "stores")
+    templates = Jinja2Templates(directory=templates_dir)
+    return templates.TemplateResponse("store_form.html", {"request": request})
+
+
+# Создание магазина
+@app.post("/admin/create_store/", response_class=HTMLResponse)
+async def create_store(
+    request: Request,
+    city: str = Form(...),
+    address: str = Form(...),
+    db: AsyncSession = Depends(get_db)
+):
+    new_store = Store(city=city, address=address)
+    db.add(new_store)
+    await db.commit()
+    return RedirectResponse(url="/admin/stores", status_code=303)
+
+
+# Удаление магазинов
+@app.post("/admin/delete_stores", response_class=HTMLResponse)
+async def delete_stores(
+    request: Request,
+    store_ids: List[int] = Form(...),
+    db: AsyncSession = Depends(get_db)
+):
+    await crud_delete_stores(db, store_ids)
+    return RedirectResponse(url="/admin/stores", status_code=303)
 
 
 @app.get("/admin/categories")

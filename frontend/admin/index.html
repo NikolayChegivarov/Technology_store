@@ -4,6 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель администратора</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --background: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2b2d42;
+            --text-light: #8d99ae;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-form {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .tab-button {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab-button:active {
+            transform: translateY(0);
+        }
+
+        .tab-button.{{ products_active }},
+        .tab-button.{{ stores_active }},
+        .tab-button.{{ categories_active }} {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-form {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
 </head>
 <body>
 <div class="admin-container">
@@ -12,13 +127,31 @@
     <!-- Вкладки -->
     <nav class="tabs">
         <form action="/admin/products/" method="get" class="tab-form">
-            <button type="submit" class="tab-button {{ products_active }}">Продукты</button>
+            <button type="submit" class="tab-button {{ products_active }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Продукты
+            </button>
         </form>
-        <form action="/admin/stores" method="get" class="tab-form">
-            <button type="submit" class="tab-button {{ stores_active }}">Магазины</button>
+        <form action="/admin/stores/" method="get" class="tab-form">
+            <button type="submit" class="tab-button {{ stores_active }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"></path>
+                    <path d="M9 22V12h6v10M2 10.6L12 2l10 8.6"></path>
+                </svg>
+                Магазины
+            </button>
         </form>
-        <form action="/admin/categories" method="get" class="tab-form">
-            <button type="submit" class="tab-button {{ categories_active }}">Категории</button>
+        <form action="/admin/categories/" method="get" class="tab-form">
+            <button type="submit" class="tab-button {{ categories_active }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Категории
+            </button>
         </form>
     </nav>
 </div>

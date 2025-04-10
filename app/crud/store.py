@@ -1,5 +1,9 @@
 # CRUD-операции для торговых точек
+from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
+
 from app.db.models import Store
 from app.schemas.store import StoreCreate
 
@@ -39,6 +43,20 @@ def get_stores(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Store).offset(skip).limit(limit).all()
 
 
+async def get_list_stores(db: AsyncSession):
+    """
+    Получение списка всех магазинов (асинхронная версия).
+
+    Args:
+        db (AsyncSession): Асинхронная сессия базы данных
+
+    Returns:
+        List[Store]: Список всех магазинов
+    """
+    result = await db.execute(select(Store))
+    return result.scalars().all()
+
+
 def create_store(db: Session, store: StoreCreate):
     """
     Создание нового магазина.
@@ -61,3 +79,43 @@ def create_store(db: Session, store: StoreCreate):
     db.commit()
     db.refresh(db_store)
     return db_store
+
+
+async def delete_store(db: AsyncSession, store_id: int):
+    """
+    Удаление магазина по ID (асинхронная версия).
+
+    Args:
+        db (AsyncSession): Асинхронная сессия базы данных
+        store_id (int): ID магазина для удаления
+
+    Returns:
+        bool: True если магазин был удален, False если не найден
+    """
+    store = await db.get(Store, store_id)
+    if store:
+        await db.delete(store)
+        await db.commit()
+        return True
+    return False
+
+
+async def delete_stores(db: AsyncSession, store_ids: List[int]):
+    """
+    Удаление нескольких магазинов по списку ID (асинхронная версия).
+
+    Args:
+        db (AsyncSession): Асинхронная сессия базы данных
+        store_ids (List[int]): Список ID магазинов для удаления
+
+    Returns:
+        int: Количество удаленных магазинов
+    """
+    count = 0
+    for store_id in store_ids:
+        store = await db.get(Store, store_id)
+        if store:
+            await db.delete(store)
+            count += 1
+    await db.commit()
+    return count
