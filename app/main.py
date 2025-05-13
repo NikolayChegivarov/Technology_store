@@ -61,10 +61,6 @@ async def admin_page(request: Request):
     templates = Jinja2Templates(directory=templates_dir)
     return templates.TemplateResponse("index.html", {"request": request})
 
-# @app.get("/admin")
-# def admin_stores(request: Request):
-#     return HTMLResponse("frontend/admin/index.html", status_code=200)
-
 
 # Список товаров, кнопки удаления, создания.
 @app.get("/admin/products/")
