@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from app.db.session import Base
 
 
-class Store(Base):
+class Store(Base):  # Филиалы
     __tablename__ = "stores"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -17,7 +17,7 @@ class Store(Base):
         return f"Store(name='{self.name}', city='{self.city}')"
 
 
-class Category(Base):
+class Category(Base):  # Категория товара
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True)
@@ -30,7 +30,7 @@ class Category(Base):
         return f"Category(name='{self.name}')"
 
 
-class Product(Base):
+class Product(Base):  # Товар
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -64,7 +64,7 @@ class Product(Base):
         }
 
 
-class User(Base):
+class User(Base):  # Пользователь
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -75,7 +75,7 @@ class User(Base):
     orders = relationship("Order", back_populates="user")
 
 
-class CartItem(Base):
+class CartItem(Base):  # Корзина
     __tablename__ = "cart_items"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -84,7 +84,7 @@ class CartItem(Base):
     quantity = Column(Integer)
 
 
-class Order(Base):
+class Order(Base):  # Заказ
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -10,10 +10,9 @@ pip install -r requirements.txt
 ```
 или установить их вручную:
 ```bash
-pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic python-jose[cryptography] passlib python-multipart pydantic-settings pytest email-validator sqlalchemy[asyncio] asyncpg
-pip install itsdangerous python-multipart 
-pip install alembic
-pip install jinja2
+pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic python-jose[cryptography] passlib python-multipart 
+pip install pydantic-settings pytest email-validator sqlalchemy[asyncio] asyncpg
+pip install itsdangerous python-multipart alembic jinja2
 ```
 4. Создать базу данных.
 5. Выполните миграции:

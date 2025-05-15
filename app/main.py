@@ -1,11 +1,14 @@
 # Точка входа в приложение, где создается экземпляр FastAPI и подключаются роутеры.
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, HTMLResponse
+from passlib.context import CryptContext
+
 from app.api.v1.endpoints import products, cart, orders, users, auth, stores, category
 from app.crud.product import get_list_product, delete_selected, create_product
 from app.db.models import Store, Category
 from app.db.session import get_db
 from app.crud.store import delete_stores as crud_delete_stores, get_list_stores
+from app.schemas.category import CategoryCreate
 from app.schemas.product import ProductCreate
 from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.templating import Jinja2Templates
@@ -16,8 +19,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import joinedload
 from app.crud.category import (
     get_categories_with_products,
-    create_category as create_category_db,
-    delete_categories as delete_categories_db
+    delete_categories, create_category
 )
 import os
 from typing import List
@@ -25,7 +27,13 @@ from typing import List
 
 app = FastAPI()
 
+# Настройки для JWT
 SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Настройки для хеширования паролей
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Подключите SessionMiddleware
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
@@ -245,15 +253,27 @@ async def admin_categories(request: Request, db: AsyncSession = Depends(get_db))
     })
 
 
-# Создание категории
+# Форма создания категории (GET)
+@app.get("/admin/category_form/", response_class=HTMLResponse)
+async def category_form(request: Request):
+    templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "categories")
+    templates = Jinja2Templates(directory=templates_dir)
+
+    return templates.TemplateResponse("create_category.html", {
+        "request": request
+    })
+
+
+# Создание категории (POST)
 @app.post("/admin/create_category/", response_class=HTMLResponse)
-async def create_category(
-        request: Request,
-        name: str = Form(...),
-        db: AsyncSession = Depends(get_db)
+async def create_category_alternative(
+    request: Request,
+    name: str = Form(...),
+    db: AsyncSession = Depends(get_db)
 ):
-    category_data = create_category(name=name)
-    created_category = await create_category_db(db, category_data)
+    # Создаем объект CategoryCreate с полученным именем
+    category_data = CategoryCreate(name=name)
+    created_category = await create_category(db, category_data)
 
     templates_dir = os.path.join(BASE_PATH, "frontend", "admin", "categories")
     templates = Jinja2Templates(directory=templates_dir)
@@ -270,5 +290,5 @@ async def delete_categories(
         category_ids: List[int] = Form(...),
         db: AsyncSession = Depends(get_db)
 ):
-    await delete_categories_db(db, category_ids)
+    await delete_categories(db, category_ids)
     return RedirectResponse(url="/admin/categories/", status_code=303)

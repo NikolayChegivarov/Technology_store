@@ -8,7 +8,7 @@ from app.db.models import Store
 from app.schemas.store import StoreCreate
 
 
-def get_store(db: Session, store_id: int):
+async def get_store(db: AsyncSession, store_id: int):
     """
     Получение информации о конкретном магазине по его ID.
 
@@ -22,10 +22,13 @@ def get_store(db: Session, store_id: int):
     Note:
         Использует SQLAlchemy для точного поиска магазина по ID
     """
-    return db.query(Store).filter(Store.id == store_id).first()
+    result = await db.execute(
+        select(Store).where(Store.id == store_id)
+    )
+    return result.scalars().first()
 
 
-def get_stores(db: Session, skip: int = 0, limit: int = 100):
+async def get_stores(db: AsyncSession, skip: int = 0, limit: int = 100):
     """
     Получение списка магазинов с поддержкой пагинации.
 
@@ -40,7 +43,10 @@ def get_stores(db: Session, skip: int = 0, limit: int = 100):
     Note:
         Использует SQLAlchemy для эффективного запроса к базе данных
     """
-    return db.query(Store).offset(skip).limit(limit).all()
+    result = await db.execute(
+        select(Store).offset(skip).limit(limit)
+    )
+    return result.scalars().all()
 
 
 async def get_list_stores(db: AsyncSession):

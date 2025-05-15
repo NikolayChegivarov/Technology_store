@@ -27,7 +27,7 @@ class CategoryCreate(CategoryBase):
     Note:
         Используется при POST-запросах для валидации входных данных
     """
-    pass
+    name: str
 
 
 class Category(CategoryBase):
